@@ -1,0 +1,46 @@
+{
+  "name": "source_search",
+  "description": "Searches the company's connected tools directly: mail in the connected mailboxes, Slack channels the connected account is in, calendars, and the CRM. Returns one line per match (system, id, date, title, snippet), newest first; read a match with source_get.",
+  "input_schema": {
+    "type": "object",
+    "properties": {
+      "query": {
+        "type": "string",
+        "description": "Case-insensitive literal terms; all must match unless any is true."
+      },
+      "any": {
+        "type": "boolean"
+      },
+      "system": {
+        "type": "string",
+        "enum": [
+          "gmail",
+          "slack",
+          "calendar",
+          "attio"
+        ]
+      },
+      "since": {
+        "type": "string",
+        "description": "ISO date-time"
+      },
+      "until": {
+        "type": "string",
+        "description": "ISO date-time"
+      },
+      "limit": {
+        "type": "integer",
+        "minimum": 1,
+        "maximum": 200,
+        "default": 50
+      },
+      "offset": {
+        "type": "integer",
+        "minimum": 0
+      }
+    }
+  },
+  "annotations": {
+    "readOnlyHint": true
+  }
+}

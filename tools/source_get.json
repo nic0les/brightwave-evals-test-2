@@ -1,0 +1,29 @@
+{
+  "name": "source_get",
+  "description": "One item from the company's connected tools, in full: a Slack message with its thread, an email with the rest of its thread listed, a calendar event, or a CRM record with its history.",
+  "input_schema": {
+    "type": "object",
+    "required": [
+      "system",
+      "id"
+    ],
+    "properties": {
+      "system": {
+        "type": "string",
+        "enum": [
+          "gmail",
+          "slack",
+          "calendar",
+          "attio"
+        ]
+      },
+      "id": {
+        "type": "string",
+        "description": "The id from source_search (Slack messages: <channel id>:<ts>)"
+      }
+    }
+  },
+  "annotations": {
+    "readOnlyHint": true
+  }
+}

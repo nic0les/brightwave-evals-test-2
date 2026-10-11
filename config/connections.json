@@ -1,0 +1,29 @@
+{
+  "gmail": {
+    "labels": [
+      "INBOX",
+      "SENT"
+    ],
+    "lookbackDays": 90
+  },
+  "calendar": {
+    "lookbackDays": 90
+  },
+  "slack": {
+    "selectChannels": [
+      "C_SALES",
+      "C_DEALS",
+      "C_CS",
+      "C_GENERAL"
+    ],
+    "lookbackDays": 90,
+    "threadLookbackDays": 30
+  },
+  "attio": {
+    "objects": [
+      "people",
+      "companies",
+      "deals"
+    ]
+  }
+}
