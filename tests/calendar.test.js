@@ -34,3 +34,29 @@ test("cancelled events are dropped", async () => {
   const { records } = await syncCalendar(api, { calendarId: "primary", config: {} }, NOW);
   assert.equal(records.length, 0);
 });
+
+test("a pass reads ahead lookaheadDays past now", () => {
+  assert.equal(syncWindow({ lookaheadDays: 60 }, NOW).windowEnd, "2026-12-01T16:40:00.000Z");
+  assert.equal(syncWindow({}, NOW).windowEnd, "2026-12-01T16:40:00.000Z");
+});
+
+test("upcoming meetings, later today and next week, are synced", async () => {
+  const api = fakeCalendar([event("e4", "2026-10-02T18:00:00.000Z"), event("e5", "2026-10-07T09:00:00.000Z")]);
+  const { records } = await syncCalendar(api, { calendarId: "primary", config: { lookbackDays: 90, lookaheadDays: 60 } }, NOW);
+  assert.deepEqual(records.map((r) => r.id), ["calendar:primary:e4", "calendar:primary:e5"]);
+});
+
+test("attendees keep their name and response status", async () => {
+  const attendees = [
+    { email: "ana@example.com", displayName: "Ana Example", responseStatus: "accepted" },
+    { email: "ben@example.org", responseStatus: "declined" },
+    { email: "cy@example.net" },
+  ];
+  const api = fakeCalendar([{ ...event("e6", "2026-10-03T10:00:00.000Z"), attendees }]);
+  const { records } = await syncCalendar(api, { calendarId: "primary", config: {} }, NOW);
+  assert.deepEqual(records[0].attendees, [
+    { email: "ana@example.com", displayName: "Ana Example", responseStatus: "accepted" },
+    { email: "ben@example.org", displayName: null, responseStatus: "declined" },
+    { email: "cy@example.net", displayName: null, responseStatus: "needsAction" },
+  ]);
+});
