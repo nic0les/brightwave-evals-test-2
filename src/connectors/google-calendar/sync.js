@@ -1,14 +1,15 @@
-import { daysBefore } from "../../util.js";
+import { daysAfter, daysBefore } from "../../util.js";
 
 /**
- * The events window of one sync pass: from the lookback start up to the window's end. A pass that
- * failed part-way retries with the window it started with.
+ * The events window of one sync pass: from the lookback start to the lookahead end, so upcoming
+ * events (and changes to them) are re-read on every pass. A pass that failed part-way retries with
+ * the window it started with.
  */
 export function syncWindow(config, now, current = {}) {
   if (current.retry && current.windowStart && current.windowEnd) return { windowStart: current.windowStart, windowEnd: current.windowEnd };
   return {
     windowStart: daysBefore(now, config.lookbackDays ?? 90),
-    windowEnd: now.toISOString(),
+    windowEnd: daysAfter(now, config.lookaheadDays ?? 60),
   };
 }
 
@@ -25,7 +26,11 @@ export function toRecord(calendarId, event) {
     title: event.summary ?? "(no title)",
     start: event.start?.dateTime ?? event.start?.date ?? null,
     end: event.end?.dateTime ?? event.end?.date ?? null,
-    attendees: (event.attendees ?? []).map((a) => a.email),
+    attendees: (event.attendees ?? []).map((a) => ({
+      email: a.email,
+      displayName: a.displayName ?? null,
+      responseStatus: a.responseStatus ?? "needsAction",
+    })),
     description: event.description ?? "",
   };
 }
