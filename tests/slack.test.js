@@ -21,3 +21,15 @@ test("recent thread replies are synced", async () => {
   };
   assert.deepEqual(await syncReplies(api, { id: "C1" }, {}, NOW), [{ ts: "1.1", text: "Confirmed." }]);
 });
+
+test("a first sweep syncs replies of older threads inside the message lookback", async () => {
+  const api = {
+    threads: async () => [
+      { ts: "1", latestReply: "2026-08-18T09:00:00.000Z" },
+      { ts: "2", latestReply: "2026-06-01T09:00:00.000Z" },
+    ],
+    replies: async (_channel, ts) => [{ ts: `${ts}.1`, text: "Approved." }],
+  };
+  const config = { lookbackDays: 90, threadLookbackDays: 30 };
+  assert.deepEqual(await syncReplies(api, { id: "C1" }, config, NOW), [{ ts: "1.1", text: "Approved." }]);
+});
